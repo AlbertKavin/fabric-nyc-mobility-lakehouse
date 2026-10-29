@@ -1,0 +1,89 @@
+{
+    "name": "pl_ingest_taxi",
+    "objectId": "5f749cd8-2b5d-4193-a0eb-4c23867227b4",
+    "properties": {
+        "activities": [
+            {
+                "name": "Copy HTTP to Lakehouse",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "BinarySource",
+                        "storeSettings": {
+                            "type": "HttpReadSettings",
+                            "requestMethod": "GET"
+                        },
+                        "formatSettings": {
+                            "type": "BinaryReadSettings"
+                        },
+                        "datasetSettings": {
+                            "annotations": [],
+                            "type": "Binary",
+                            "typeProperties": {
+                                "location": {
+                                    "type": "HttpServerLocation",
+                                    "relativeUrl": {
+                                        "value": "@concat('yellow_tripdata_',pipeline().parameters.year_month,'.parquet')",
+                                        "type": "Expression"
+                                    }
+                                }
+                            },
+                            "externalReferences": {
+                                "connection": "b7f06664-5bfd-4f55-ab60-44f7c4a3dcc6"
+                            }
+                        }
+                    },
+                    "sink": {
+                        "type": "BinarySink",
+                        "storeSettings": {
+                            "type": "LakehouseWriteSettings"
+                        },
+                        "datasetSettings": {
+                            "annotations": [],
+                            "linkedService": {
+                                "name": "lh_nyc_mobility",
+                                "properties": {
+                                    "annotations": [],
+                                    "type": "Lakehouse",
+                                    "typeProperties": {
+                                        "workspaceId": "2db13aa3-e07f-4f80-a32c-58a5bc53b7d3",
+                                        "artifactId": "6ed28bc5-0db2-4874-9e2a-fb59862548b0",
+                                        "rootFolder": "Files"
+                                    }
+                                }
+                            },
+                            "type": "Binary",
+                            "typeProperties": {
+                                "location": {
+                                    "type": "LakehouseLocation",
+                                    "fileName": {
+                                        "value": "@concat('yellow_tripdata_',pipeline().parameters.year_month,'.parquet')",
+                                        "type": "Expression"
+                                    },
+                                    "folderPath": "Bronze/taxi"
+                                }
+                            }
+                        }
+                    },
+                    "enableStaging": false
+                }
+            }
+        ],
+        "parameters": {
+            "year_month": {
+                "type": "string",
+                "defaultValue": "2024-01"
+            }
+        },
+        "lastModifiedByObjectId": "5b982241-b03f-4e33-bdbd-c626af513dfc",
+        "lastPublishTime": "2026-10-29T05:46:36Z"
+    }
+}
