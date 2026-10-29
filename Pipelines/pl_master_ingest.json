@@ -1,0 +1,129 @@
+{
+    "name": "pl_master_ingest",
+    "objectId": "23e6bc63-cb15-4e07-a3cb-05fe37830879",
+    "properties": {
+        "activities": [
+            {
+                "name": "Lookup config",
+                "type": "Lookup",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "LakehouseTableSource"
+                    },
+                    "firstRowOnly": false,
+                    "datasetSettings": {
+                        "annotations": [],
+                        "linkedService": {
+                            "name": "lh_nyc_mobility",
+                            "properties": {
+                                "annotations": [],
+                                "type": "Lakehouse",
+                                "typeProperties": {
+                                    "workspaceId": "2db13aa3-e07f-4f80-a32c-58a5bc53b7d3",
+                                    "artifactId": "6ed28bc5-0db2-4874-9e2a-fb59862548b0",
+                                    "rootFolder": "Tables"
+                                }
+                            }
+                        },
+                        "type": "LakehouseTable",
+                        "schema": [],
+                        "typeProperties": {
+                            "schema": "ops",
+                            "table": "pipeline_config"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "ForEach_month",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "Lookup config",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Lookup config').output.value",
+                        "type": "Expression"
+                    },
+                    "isSequential": true,
+                    "activities": [
+                        {
+                            "name": "Invoke Taxi",
+                            "type": "InvokePipeline",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "typeProperties": {
+                                "waitOnCompletion": true,
+                                "operationType": "InvokeFabricPipeline",
+                                "pipelineId": "5f749cd8-2b5d-4193-a0eb-4c23867227b4",
+                                "workspaceId": "2db13aa3-e07f-4f80-a32c-58a5bc53b7d3",
+                                "parameters": {
+                                    "year_month": "@item().year_month"
+                                }
+                            },
+                            "externalReferences": {
+                                "connection": "04c4e50c-3459-421b-b4fb-7d05c68b4ee4"
+                            }
+                        },
+                        {
+                            "name": "Invoke weather",
+                            "type": "InvokePipeline",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "typeProperties": {
+                                "waitOnCompletion": true,
+                                "operationType": "InvokeFabricPipeline",
+                                "pipelineId": "816a0c35-617d-4c75-bd28-56a1c6f78ba5",
+                                "workspaceId": "2db13aa3-e07f-4f80-a32c-58a5bc53b7d3",
+                                "parameters": {
+                                    "year_month": {
+                                        "value": "@item().year_month",
+                                        "type": "Expression"
+                                    },
+                                    "start_date": {
+                                        "value": "@item().start_date",
+                                        "type": "Expression"
+                                    },
+                                    "end_date": {
+                                        "value": "@item().end_date",
+                                        "type": "Expression"
+                                    }
+                                }
+                            },
+                            "externalReferences": {
+                                "connection": "04c4e50c-3459-421b-b4fb-7d05c68b4ee4"
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "lastModifiedByObjectId": "5b982241-b03f-4e33-bdbd-c626af513dfc",
+        "lastPublishTime": "2026-10-29T17:48:25Z"
+    }
+}

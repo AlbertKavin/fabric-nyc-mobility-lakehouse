@@ -1,0 +1,94 @@
+{
+    "name": "pl_ingest_weather",
+    "objectId": "816a0c35-617d-4c75-bd28-56a1c6f78ba5",
+    "properties": {
+        "activities": [
+            {
+                "name": "Copy HTTP To Lakehouse Weather",
+                "type": "Copy",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "source": {
+                        "type": "BinarySource",
+                        "storeSettings": {
+                            "type": "HttpReadSettings",
+                            "requestMethod": "GET"
+                        },
+                        "formatSettings": {
+                            "type": "BinaryReadSettings"
+                        },
+                        "datasetSettings": {
+                            "annotations": [],
+                            "type": "Binary",
+                            "typeProperties": {
+                                "location": {
+                                    "type": "HttpServerLocation",
+                                    "relativeUrl": {
+                                        "value": "@concat('v1/archive?latitude=40.71&longitude=-74.01&start_date=', pipeline().parameters.start_date, '&end_date=', pipeline().parameters.end_date, '&hourly=temperature_2m,precipitation,wind_speed_10m&timezone=auto')",
+                                        "type": "Expression"
+                                    }
+                                }
+                            },
+                            "externalReferences": {
+                                "connection": "b156eaf0-11ac-47fa-ac00-aafde9e98612"
+                            }
+                        }
+                    },
+                    "sink": {
+                        "type": "BinarySink",
+                        "storeSettings": {
+                            "type": "LakehouseWriteSettings"
+                        },
+                        "datasetSettings": {
+                            "annotations": [],
+                            "linkedService": {
+                                "name": "lh_nyc_mobility",
+                                "properties": {
+                                    "annotations": [],
+                                    "type": "Lakehouse",
+                                    "typeProperties": {
+                                        "workspaceId": "2db13aa3-e07f-4f80-a32c-58a5bc53b7d3",
+                                        "artifactId": "6ed28bc5-0db2-4874-9e2a-fb59862548b0",
+                                        "rootFolder": "Files"
+                                    }
+                                }
+                            },
+                            "type": "Binary",
+                            "typeProperties": {
+                                "location": {
+                                    "type": "LakehouseLocation",
+                                    "fileName": {
+                                        "value": "@concat('weather_', pipeline().parameters.year_month, '.json')",
+                                        "type": "Expression"
+                                    },
+                                    "folderPath": "Bronze/weather"
+                                }
+                            }
+                        }
+                    },
+                    "enableStaging": false
+                }
+            }
+        ],
+        "parameters": {
+            "year_month": {
+                "type": "string"
+            },
+            "start_date": {
+                "type": "string"
+            },
+            "end_date": {
+                "type": "string"
+            }
+        },
+        "lastModifiedByObjectId": "5b982241-b03f-4e33-bdbd-c626af513dfc",
+        "lastPublishTime": "2026-10-29T17:41:34Z"
+    }
+}
