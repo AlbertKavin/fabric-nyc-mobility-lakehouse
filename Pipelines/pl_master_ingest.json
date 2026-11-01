@@ -77,7 +77,10 @@
                                 "pipelineId": "5f749cd8-2b5d-4193-a0eb-4c23867227b4",
                                 "workspaceId": "2db13aa3-e07f-4f80-a32c-58a5bc53b7d3",
                                 "parameters": {
-                                    "year_month": "@item().year_month"
+                                    "year_month": {
+                                        "value": "@item().year_month",
+                                        "type": "Expression"
+                                    }
                                 }
                             },
                             "externalReferences": {
@@ -118,12 +121,79 @@
                             "externalReferences": {
                                 "connection": "04c4e50c-3459-421b-b4fb-7d05c68b4ee4"
                             }
+                        },
+                        {
+                            "name": "NB Bronze to silver",
+                            "type": "TridentNotebook",
+                            "dependsOn": [
+                                {
+                                    "activity": "Invoke Taxi",
+                                    "dependencyConditions": [
+                                        "Completed"
+                                    ]
+                                },
+                                {
+                                    "activity": "Invoke weather",
+                                    "dependencyConditions": [
+                                        "Completed"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "typeProperties": {
+                                "notebookId": "9da4c690-0470-4c3a-8be0-f079e8f47772",
+                                "workspaceId": "2db13aa3-e07f-4f80-a32c-58a5bc53b7d3",
+                                "parameters": {
+                                    "year_month": {
+                                        "value": {
+                                            "value": "@item().year_month",
+                                            "type": "Expression"
+                                        },
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "externalReferences": {
+                                "connection": "3f18610e-eab3-4e7d-b0fe-540827a7b80b"
+                            }
                         }
                     ]
+                }
+            },
+            {
+                "name": "Nb Silver to Gold",
+                "type": "TridentNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "ForEach_month",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "typeProperties": {
+                    "notebookId": "4a1c432a-3023-4b6b-a660-a8efff176053",
+                    "workspaceId": "2db13aa3-e07f-4f80-a32c-58a5bc53b7d3"
+                },
+                "externalReferences": {
+                    "connection": "3f18610e-eab3-4e7d-b0fe-540827a7b80b"
                 }
             }
         ],
         "lastModifiedByObjectId": "5b982241-b03f-4e33-bdbd-c626af513dfc",
-        "lastPublishTime": "2026-10-29T17:48:25Z"
+        "lastPublishTime": "2026-10-31T08:45:37Z"
     }
 }
