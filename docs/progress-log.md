@@ -10,3 +10,5 @@
 ## Day 2 - 29 Oct 2026
 - Built `pl_ingest_weather` (Copy activity, HTTP to Lakehouse Files)
 - Built a parameterized master pipeline `pl_master_ingest` and loaded three months of data for taxi and weather
+
+## Day 2 - 31 Oct 2026
